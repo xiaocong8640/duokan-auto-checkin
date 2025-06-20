@@ -1,0 +1,28 @@
+name: 多看阅读自动任务
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # 北京时间10:00执行（UTC+8→UTC+2）
+  workflow_dispatch:      # 支持手动触发
+
+jobs:
+  duokan-task:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+      - name: 设置Python环境
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: 安装依赖
+        run: pip install requests
+      - name: 执行多看任务
+        env:
+          DUOKAN_COOKIE: ${{ secrets.DUOKAN_COOKIE }}
+          SERVERCHAN_KEY: ${{ secrets.SERVERCHAN_KEY }}
+        run: |
+          python duokan_auto.py
+      - name: 清理缓存
+        run: |
+          rm -rf __pycache__
